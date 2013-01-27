@@ -1,0 +1,20 @@
+{
+    "name": "itr/delayedjob-bundle",
+    "description": "Delayed Job bundle",
+    "keywords": ["job","queue", "delayed"],
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [],
+    "require": {
+        "php": ">=5.3.3",
+        "doctrine/orm": ">=2.2.3,<2.4-dev",
+        "doctrine/doctrine-bundle": "1.1.*"
+    },
+    "require-dev": {
+        "fzaninotto/faker": "1.1.*@dev"
+    },
+    "autoload": {
+        "psr-0": { "Itr\\DelayedJobBundle": "" }
+    },
+    "target-dir": "Itr/DelayedJobBundle"
+}
