@@ -22,7 +22,7 @@ Itr\DelayedJobBundle\Entity\Job:
             type: string
             length: 255
             fixed: false
-            nullable: false
+            nullable: true
             column: last_result
         priority:
             type: integer
@@ -42,6 +42,10 @@ Itr\DelayedJobBundle\Entity\Job:
             unsigned: false
             nullable: false
         cyclic:
+            type: boolean
+            unsigned: false
+            nullable: false
+        locked:
             type: boolean
             unsigned: false
             nullable: false

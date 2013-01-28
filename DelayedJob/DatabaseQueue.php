@@ -3,9 +3,6 @@
 namespace Itr\DelayedJobBundle\DelayedJob;
 
 use Itr\DelayedJobBundle\DelayedJob\Job\JobInterface;
-use Itr\DelayedJobBundle\DelayedJob\Job\AbstractJob;
-use Itr\DelayedJobBundle\DelayedJob\Result\JobResult;
-use Itr\DelayedJobBundle\Exception\InvalidJobResultException;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Itr\DelayedJobBundle\Entity\Job as JobEntity;
@@ -42,7 +39,7 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
      */
     public function enqueue(JobInterface $job, $queue = self::DEFAULT_QUEUE, $priority = 0, $attempts = 5, $cyclic = false, $period = 0)
     {
-        $this->insert(new JobProxy($job, $priority, $attempts, 0, $cyclic, $period));
+        $this->insert(new DatabaseJobProxy($job, 0, $priority, $attempts, 0, $cyclic, $period));
 
         return $this;
     }
@@ -65,18 +62,23 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
         $iterator = 0;
         while (++$iterator <= $portion && $queue->valid()) {
 
-            /** @var JobProxy $proxy  */
+            /** @var DatabaseJobProxy $proxy  */
             $proxy = $queue->current();
             $result = $this->execute($proxy->getJob());
 
             // if count of attempts less then spent attempts adds this job again
             if ($result->isFailed() && $proxy->getAttemptsSpent() < $proxy->getAttempts()) {
                 $proxy->setAttemptsSpent($proxy->getAttemptsSpent() + 1);
-                $failed[] = array('proxy' => new JobProxy($proxy->getJob(), $proxy->getPriority(), $proxy->getAttempts(), $proxy->getAttemptsSpent(), $proxy->getCyclic(), $proxy->getPeriod()), 'priority' => $proxy->getPriority());
+                $proxy->setLastResult($result);
+                $proxy->setId(0);
+                $failed[] = $proxy;
 
             // if it's a cyclic job adds it again
             } elseif ($proxy->getCyclic()) {
-                $cyclic[] = array('proxy' => new JobProxy($proxy->getJob(), $proxy->getPriority(), $proxy->getAttempts(), $proxy->getAttemptsSpent(), $proxy->getCyclic(), $proxy->getPeriod()), 'priority' => $proxy->getPriority());
+                $proxy->setAttemptsSpent($proxy->getAttemptsSpent() + 1);
+                $proxy->setLastResult($result);
+                $proxy->setId(0);
+                $failed[] = $proxy;
             }
 
             $queue->next();
@@ -84,11 +86,11 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
 
         // inserts all failed jobs that have an attempt
         foreach ($failed as $item) {
-            $this->insert($item['proxy'], $name);
+            $this->insert($item, $name);
         }
         // reinserts all cyclic jobs that have an attempt
         foreach ($cyclic as $item) {
-            $this->insert($item['proxy'], $name);
+            $this->insert($item, $name);
         }
     }
 
@@ -101,6 +103,10 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
     protected function insert($proxy, $queue = self::DEFAULT_QUEUE)
     {
         $jobEntity = $this->proxyToEntity($proxy, $queue);
+        $jobEntity->setCreatedAt(new \DateTime());
+        $dateTime = new \DateTime();
+        $dateTime->add(\DateInterval::createFromDateString($proxy->getPeriod() . ' seconds'));
+        $jobEntity->setNextRunAt($dateTime);
 
         $em = $this->container->get('doctrine')->getManager();
         $em->persist($jobEntity);
@@ -132,6 +138,9 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
         $queue = new \SplPriorityQueue();
         foreach ($result as $entity) {
             $queue->insert($this->entityToProxy($entity), $entity->getPriority());
+
+            $em->remove($entity);
+            $em->flush();
         }
 
         return $queue;
@@ -140,7 +149,7 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
     /**
      * Converts proxy to db entity
      *
-     * @param $proxy
+     * @param DatabaseJobProxy $proxy
      * @param $queue
      * @return \Itr\DelayedJobBundle\Entity\Job
      */
@@ -154,6 +163,7 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
         $jobEntity->setCyclic($proxy->getCyclic());
         $jobEntity->setPeriod($proxy->getPeriod());
         $jobEntity->setJob(serialize($proxy->getJob()));
+        $jobEntity->setLastResult(serialize($proxy->getLastResult()));
 
         return $jobEntity;
     }
@@ -162,11 +172,20 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
      * Converts entity to proxy
      *
      * @param $jobEntity
-     * @return JobProxy
+     * @return DatabaseJobProxy
      */
     protected function entityToProxy($jobEntity)
     {
-        return new JobProxy(unserialize($jobEntity), $jobEntity->getPriority(), $jobEntity->getAttempts(), $jobEntity->getAttemptsSpent(), $jobEntity->getCyclic(), $jobEntity->getPeriod());
+        $proxy = new DatabaseJobProxy(unserialize($jobEntity->getJob()),
+            $jobEntity->getId(),
+            $jobEntity->getPriority(),
+            $jobEntity->getAttempts(),
+            $jobEntity->getAttemptsSpent(),
+            $jobEntity->getCyclic(),
+            $jobEntity->getPeriod());
+
+        $proxy->setLastResult(unserialize($jobEntity->getLastResult()));
+        return $proxy;
     }
 
     /**

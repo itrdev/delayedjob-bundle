@@ -34,7 +34,12 @@ class Job
     /**
      * @var bool $cyclic
      */
-    private $cyclic;
+    private $cyclic = false;
+
+    /**
+     * @var bool $locked
+     */
+    private $locked = false;
 
     /**
      * @var \DateTime $createdAt
@@ -257,5 +262,21 @@ class Job
     public function getPeriod()
     {
         return $this->period;
+    }
+
+    /**
+     * @param boolean $locked
+     */
+    public function setLocked($locked)
+    {
+        $this->locked = $locked;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getLocked()
+    {
+        return $this->locked;
     }
 }
