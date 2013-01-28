@@ -39,7 +39,7 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
      */
     public function enqueue(JobInterface $job, $queue = self::DEFAULT_QUEUE, $priority = 0, $attempts = 5, $cyclic = false, $period = 0)
     {
-        $this->insert(new DatabaseJobProxy($job, 0, $priority, $attempts, 0, $cyclic, $period));
+        $this->insert(new DatabaseJobProxy($job, 0, $priority, $attempts, 0, $cyclic, $period), $queue);
 
         return $this;
     }
