@@ -32,6 +32,7 @@ Itr\DelayedJobBundle\Entity\Job:
             type: integer
             unsigned: false
             nullable: false
+            column: attempts_spent
         cyclic:
             type: boolean
             unsigned: false
