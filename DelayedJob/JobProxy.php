@@ -2,7 +2,9 @@
 
 namespace Itr\DelayedJobBundle\DelayedJob;
 
-class DelayedJobProxy
+use Itr\DelayedJobBundle\DelayedJob\Job\JobInterface;
+
+class JobProxy
 {
     /**
      * @var int
@@ -15,32 +17,39 @@ class DelayedJobProxy
     protected $attempts = 5;
 
     /**
+     * @var int
+     */
+    protected $attemptsSpent = 0;
+
+    /**
      * @var bool
      */
     protected $cyclic = true;
 
     /**
-     * @var DelayedJobInterface
+     * @var \Itr\DelayedJobBundle\DelayedJob\Job\JobInterface
      */
     protected $job;
 
     /**
-     * @param DelayedJobInterface $job
+     * @param \Itr\DelayedJobBundle\DelayedJob\Job\JobInterface $job
      * @param int $priority
      * @param int $attempts
+     * @param int $attemptsSpent
      * @param bool $cyclic
      */
-    public function __construct(DelayedJobInterface $job, $priority = 0, $attempts = 5, $cyclic = false)
+    public function __construct(JobInterface $job, $priority = 0, $attempts = 5, $attemptsSpent = 0, $cyclic = false)
     {
         $this->setJob($job)
             ->setPriority($priority)
             ->setAttempts($attempts)
+            ->setAttemptsSpent($attemptsSpent)
             ->setCyclic($cyclic);
     }
 
     /**
      * @param $attempts
-     * @return DelayedJobProxy
+     * @return JobProxy
      */
     public function setAttempts($attempts)
     {
@@ -58,8 +67,27 @@ class DelayedJobProxy
     }
 
     /**
+     * @param int $attemptsSpent
+     * @return JobProxy
+     */
+    public function setAttemptsSpent($attemptsSpent)
+    {
+        $this->attemptsSpent = $attemptsSpent;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAttemptsSpent()
+    {
+        return $this->attemptsSpent;
+    }
+
+    /**
      * @param $cyclic
-     * @return DelayedJobProxy
+     * @return JobProxy
      */
     public function setCyclic($cyclic)
     {
@@ -78,7 +106,7 @@ class DelayedJobProxy
 
     /**
      * @param $job
-     * @return DelayedJobProxy
+     * @return JobProxy
      */
     public function setJob($job)
     {
@@ -88,7 +116,7 @@ class DelayedJobProxy
     }
 
     /**
-     * @return DelayedJobInterface
+     * @return JobInterface
      */
     public function getJob()
     {
@@ -97,7 +125,7 @@ class DelayedJobProxy
 
     /**
      * @param $priority
-     * @return DelayedJobProxy
+     * @return JobProxy
      */
     public function setPriority($priority)
     {
