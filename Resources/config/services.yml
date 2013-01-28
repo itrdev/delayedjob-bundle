@@ -1,0 +1,8 @@
+parameters:
+    itr_delayed_job.database_queue.class: Itr\DelayedJobBundle\DelayedJob\DatabaseQueue
+
+services:
+    itr_database_queue:
+        class: %itr_delayed_job.database_queue.class%
+        calls:
+          - [ setContainer, [ @service_container ] ]

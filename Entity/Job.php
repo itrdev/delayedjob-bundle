@@ -56,6 +56,16 @@ class Job
      */
     private $lastResult;
 
+    /**
+     * @var string $job
+     */
+    private $job;
+
+    /**
+     * @var int $period
+     */
+    private $period;
+
 
     /**
      * @param int $attempts
@@ -215,5 +225,37 @@ class Job
     public function getUpdatedAt()
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * @param string $job
+     */
+    public function setJob($job)
+    {
+        $this->job = $job;
+    }
+
+    /**
+     * @return string
+     */
+    public function getJob()
+    {
+        return $this->job;
+    }
+
+    /**
+     * @param int $period
+     */
+    public function setPeriod($period)
+    {
+        $this->period = $period;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPeriod()
+    {
+        return $this->period;
     }
 }

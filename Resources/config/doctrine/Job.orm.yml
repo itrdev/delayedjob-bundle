@@ -14,6 +14,10 @@ Itr\DelayedJobBundle\Entity\Job:
             length: 255
             fixed: false
             nullable: false
+        job:
+            type: text
+            fixed: false
+            nullable: false
         lastResult:
             type: string
             length: 255
@@ -33,6 +37,10 @@ Itr\DelayedJobBundle\Entity\Job:
             unsigned: false
             nullable: false
             column: attempts_spent
+        period:
+            type: integer
+            unsigned: false
+            nullable: false
         cyclic:
             type: boolean
             unsigned: false

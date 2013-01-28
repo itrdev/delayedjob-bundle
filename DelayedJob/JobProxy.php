@@ -32,19 +32,27 @@ class JobProxy
     protected $job;
 
     /**
+     * @var int
+     */
+    protected $period;
+
+
+    /**
      * @param \Itr\DelayedJobBundle\DelayedJob\Job\JobInterface $job
      * @param int $priority
      * @param int $attempts
      * @param int $attemptsSpent
+     * @param int $period
      * @param bool $cyclic
      */
-    public function __construct(JobInterface $job, $priority = 0, $attempts = 5, $attemptsSpent = 0, $cyclic = false)
+    public function __construct(JobInterface $job, $priority = 0, $attempts = 5, $attemptsSpent = 0, $cyclic = false, $period = 0)
     {
         $this->setJob($job)
             ->setPriority($priority)
             ->setAttempts($attempts)
             ->setAttemptsSpent($attemptsSpent)
-            ->setCyclic($cyclic);
+            ->setCyclic($cyclic)
+            ->setPeriod($period);
     }
 
     /**
@@ -140,5 +148,24 @@ class JobProxy
     public function getPriority()
     {
         return $this->priority;
+    }
+
+    /**
+     * @param int $period
+     * @return JobProxy
+     */
+    public function setPeriod($period)
+    {
+        $this->period = $period;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPeriod()
+    {
+        return $this->period;
     }
 }
