@@ -1,0 +1,57 @@
+Itr\DelayedJobBundle\DelayedJob\Entity\Job:
+    type: entity
+    table: delayed_job
+    fields:
+        id:
+            id: true
+            type: integer
+            unsigned: false
+            nullable: false
+            generator:
+                strategy: IDENTITY
+        queue:
+            type: string
+            length: 255
+            fixed: false
+            nullable: false
+        lastResult:
+            type: string
+            length: 255
+            fixed: false
+            nullable: false
+            column: last_result
+        priority:
+            type: integer
+            unsigned: false
+            nullable: false
+        attempts:
+            type: integer
+            unsigned: false
+            nullable: false
+        attemptsSpent:
+            type: integer
+            unsigned: false
+            nullable: false
+        cyclic:
+            type: boolean
+            unsigned: false
+            nullable: false
+        createdAt:
+            type: datetime
+            nullable: false
+            column: created_at
+            gedmo:
+                timestampable:
+                    on: create
+        updatedAt:
+            type: datetime
+            nullable: true
+            column: updated_at
+            gedmo:
+                timestampable:
+                    on: update
+        nextRunAt:
+            type: datetime
+            nullable: true
+            column: next_run_at
+    lifecycleCallbacks: {  }
