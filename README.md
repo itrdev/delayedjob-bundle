@@ -13,3 +13,4 @@ Basic Usage
 TODO
 ====
 1. write the documentations.
+2. write a cron command to execute jobs
