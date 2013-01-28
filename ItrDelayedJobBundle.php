@@ -4,6 +4,6 @@ namespace Itr\DelayedJobBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class DelayedJobBundle extends Bundle
+class ItrDelayedJobBundle extends Bundle
 {
 }
