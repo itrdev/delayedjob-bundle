@@ -1,6 +1,6 @@
 <?php
 
-namespace Itr\DelayedJobBundle\DelayedJob\Entity;
+namespace Itr\DelayedJobBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

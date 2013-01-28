@@ -1,4 +1,4 @@
-Itr\DelayedJobBundle\DelayedJob\Entity\Job:
+Itr\DelayedJobBundle\Entity\Job:
     type: entity
     table: delayed_job
     fields:
