@@ -15,4 +15,7 @@
             <directory>./Tests</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <server name="KERNEL_DIR" value="./Tests/Fixture/app" />
+    </php>
 </phpunit>
