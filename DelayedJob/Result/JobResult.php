@@ -36,6 +36,11 @@ class JobResult
         return $this->result;
     }
 
+    public function getFromResult($key, $default= null)
+    {
+        return isset($this->result[$key]) ? $this->result[$key] : $default;
+    }
+
     public function setError($error)
     {
         $this->error = $error;
