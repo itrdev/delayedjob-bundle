@@ -3,8 +3,9 @@
 namespace Itr\DelayedJobBundle\DelayedJob\Job;
 
 use Itr\DelayedJobBundle\DelayedJob\Result\JobResult;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
-abstract class AbstractJob
+abstract class AbstractJob extends ContainerAware
 {
 
     /**
