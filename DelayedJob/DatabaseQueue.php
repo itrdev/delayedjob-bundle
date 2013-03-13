@@ -176,7 +176,7 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
      */
     protected function entityToProxy($jobEntity)
     {
-        $proxy = new DatabaseJobProxy(unserialize($jobEntity->getJob()),
+        $proxy = new DatabaseJobProxy(@unserialize($jobEntity->getJob()),
             $jobEntity->getId(),
             $jobEntity->getPriority(),
             $jobEntity->getAttempts(),
@@ -184,7 +184,7 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
             $jobEntity->getCyclic(),
             $jobEntity->getPeriod());
 
-        $proxy->setLastResult(unserialize($jobEntity->getLastResult()));
+        $proxy->setLastResult(@unserialize($jobEntity->getLastResult()));
         return $proxy;
     }
 
