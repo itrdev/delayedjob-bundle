@@ -49,17 +49,19 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
      *
      * @param int $portion
      * @param string $name
+     * @return int
      */
     public function run($portion = 10, $name = self::DEFAULT_QUEUE)
     {
         $queue = $this->getQueue($name);
         if ($queue->isEmpty()) {
-            return;
+            return 0;
         }
 
         $failed = array();
         $cyclic = array();
         $iterator = 0;
+        $done = 0;
         while (++$iterator <= $portion && $queue->valid()) {
 
             /** @var DatabaseJobProxy $proxy  */
@@ -73,12 +75,15 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
                 $proxy->setId(0);
                 $failed[] = $proxy;
 
-            // if it's a cyclic job adds it again
+                // if it's a cyclic job adds it again
             } elseif ($proxy->getCyclic()) {
                 $proxy->setAttemptsSpent($proxy->getAttemptsSpent() + 1);
                 $proxy->setLastResult($result);
                 $proxy->setId(0);
                 $failed[] = $proxy;
+                $done++;
+            } else {
+                $done++;
             }
 
             $queue->next();
@@ -92,6 +97,8 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
         foreach ($cyclic as $item) {
             $this->insert($item, $name);
         }
+
+        return $done;
     }
 
     /**
