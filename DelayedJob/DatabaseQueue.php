@@ -169,8 +169,9 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
         $jobEntity->setAttemptsSpent($proxy->getAttemptsSpent());
         $jobEntity->setCyclic($proxy->getCyclic());
         $jobEntity->setPeriod($proxy->getPeriod());
-        $jobEntity->setJob(serialize($proxy->getJob()));
-        $jobEntity->setLastResult(serialize($proxy->getLastResult()));
+        $proxy->getJob()->setContainer(null);
+        $jobEntity->setJob(@serialize($proxy->getJob()));
+        $jobEntity->setLastResult(@serialize($proxy->getLastResult()));
 
         return $jobEntity;
     }
