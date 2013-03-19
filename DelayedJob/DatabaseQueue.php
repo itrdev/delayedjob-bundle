@@ -61,6 +61,7 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
         $failed = array();
         $cyclic = array();
         $iterator = 0;
+        $count = 0;
         while (++$iterator <= $portion && $queue->valid()) {
 
             /** @var DatabaseJobProxy $proxy  */
@@ -80,6 +81,9 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
                 $proxy->setLastResult($result);
                 $proxy->setId(0);
                 $failed[] = $proxy;
+                $count ++;
+            } else {
+                $count++;
             }
 
             $queue->next();
@@ -93,6 +97,8 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
         foreach ($cyclic as $item) {
             $this->insert($item, $name);
         }
+
+        return $count;
     }
 
     /**
