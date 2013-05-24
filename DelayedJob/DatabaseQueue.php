@@ -53,7 +53,7 @@ class DatabaseQueue extends MemoryQueue implements ContainerAwareInterface
      */
     public function run($portion = 10, $name = self::DEFAULT_QUEUE)
     {
-        $queue = $this->getQueue($name);
+        $queue = $this->getQueue($name, $portion);
         if ($queue->isEmpty()) {
             return 0 ;
         }
